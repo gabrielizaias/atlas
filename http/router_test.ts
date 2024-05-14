@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps_dev.ts";
-import { Status, STATUS_TEXT } from "./deps.ts";
+import { STATUS_CODE, STATUS_TEXT } from "./deps.ts";
 import {
 	type Handler,
 	isMethod,
@@ -9,7 +9,6 @@ import {
 	notFound,
 	type Params,
 	redirect,
-	REDIRECT_STATUS_CODES,
 	type RouteMap,
 	Router,
 	toHandler,
@@ -52,15 +51,12 @@ for (const method of Object.values(METHODS)) {
 		// @ts-ignore
 		router[fn]("/", handler);
 
-		assertEquals(
-			router.routes,
-			new Map([[`${method} /`, handler]]),
-		);
+		assertEquals(router.routes, new Map([[`${method} /`, handler]]));
 	});
 }
 
 Deno.test("[http/router] router.handler() returns a Response", async () => {
-	const data = new Response("ok", { statusText: STATUS_TEXT[Status.OK] });
+	const data = new Response("ok", { statusText: STATUS_TEXT[STATUS_CODE.OK] });
 	const router = new Router().get("/", () => data);
 	const request = new Request(new URL("/", "http://localhost:8000"));
 
@@ -90,13 +86,13 @@ Deno.test("[http/router] router.handler() returns an object response as JSON", a
 
 Deno.test("[http/router] router.handler() handles thrown HTTP statuses", async () => {
 	const router = new Router().get("/", () => {
-		throw Status.Forbidden;
+		throw STATUS_CODE.Forbidden;
 	});
 	const request = new Request(new URL("/", "http://localhost:8000"));
 
 	const response = await router.handler(request);
 
-	assertEquals(response.status, Status.Forbidden);
+	assertEquals(response.status, STATUS_CODE.Forbidden);
 });
 
 Deno.test("[http/router] passes URL params to handler context", async () => {
@@ -106,19 +102,14 @@ Deno.test("[http/router] passes URL params to handler context", async () => {
 			params.id = id;
 			return {};
 		})
-		.get(
-			"/:category/:subcategory",
-			(_, { params: { category, subcategory } }) => {
-				params.category = category;
-				params.subcategory = subcategory;
-				return {};
-			},
-		);
+		.get("/:category/:subcategory", (_, { params: { category, subcategory } }) => {
+			params.category = category;
+			params.subcategory = subcategory;
+			return {};
+		});
 
 	const request1 = new Request(new URL("/12345", "http://localhost:8000"));
-	const request2 = new Request(
-		new URL("/computers/laptops", "http://localhost:8000"),
-	);
+	const request2 = new Request(new URL("/computers/laptops", "http://localhost:8000"));
 
 	await router.handler(request1);
 	await router.handler(request2);
@@ -214,10 +205,7 @@ Deno.test("[http/router] toPattern() returns a valid URLPattern pattern", () => 
 		[toPattern("/index.ts"), "/"],
 		[toPattern("/nested/index.ts"), "/nested"],
 		[toPattern("/[id].ts"), "/:id"],
-		[
-			toPattern("/categories/[category]/[subcategory].ts"),
-			"/categories/:category/:subcategory",
-		],
+		[toPattern("/categories/[category]/[subcategory].ts"), "/categories/:category/:subcategory"],
 		[toPattern("/[...slug].ts"), "/:slug*"],
 	]);
 
@@ -231,10 +219,7 @@ Deno.test("[http/router] toParams() returns a key-value object of URL params", (
 		[toParams("/", "/"), {}],
 		[toParams("/123", "/:id"), { id: "123" }],
 		[
-			toParams(
-				"/test/category-1/subcategory-2",
-				"/test/:category/:subcategory",
-			),
+			toParams("/test/category-1/subcategory-2", "/test/:category/:subcategory"),
 			{
 				category: "category-1",
 				subcategory: "subcategory-2",
@@ -275,11 +260,21 @@ Deno.test("[http/router] toHandler() returns a Handler function", () => {
 
 Deno.test("[http/router] notFound() returns an HTTP 404 response", () => {
 	const response = notFound();
-	assertEquals(response.status, Status.NotFound);
-	assertEquals(response.statusText, STATUS_TEXT[Status.NotFound]);
+	assertEquals(response.status, STATUS_CODE.NotFound);
+	assertEquals(response.statusText, STATUS_TEXT[STATUS_CODE.NotFound]);
 });
 
-for (const status of Object.values(REDIRECT_STATUS_CODES)) {
+for (
+	const status of [
+		STATUS_CODE.MultipleChoices,
+		STATUS_CODE.MovedPermanently,
+		STATUS_CODE.Found,
+		STATUS_CODE.SeeOther,
+		STATUS_CODE.UseProxy,
+		STATUS_CODE.TemporaryRedirect,
+		STATUS_CODE.PermanentRedirect,
+	]
+) {
 	Deno.test(`[http/router] redirect() returns an HTTP ${status} response`, () => {
 		const response = redirect("https://example.com", status);
 		assertEquals(response.status, status);

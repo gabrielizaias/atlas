@@ -1,4 +1,11 @@
 {
+	"name": "@atlasland/atlas",
+	"version": "0.5.2",
+	"exports": {
+		"./console": "./console/mod.ts",
+		"./error": "./error/mod.ts",
+		"./http": "./http/mod.ts"
+	},
 	"compilerOptions": {
 		"allowJs": false,
 		"lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],

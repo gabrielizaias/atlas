@@ -44,19 +44,13 @@ export type HandlerMap = Map<Method, Handler>;
 export type Handler<P extends Params = Record<string, string | undefined>> = (
 	request: Request,
 	context: Context<P>,
-) =>
-	| Response
-	| Promise<Response>
-	| Record<string, unknown>
-	| Promise<Record<string, unknown>>;
+) => Response | Promise<Response> | Record<string, unknown> | Promise<Record<string, unknown>>;
 
 /** The Request context */
-export type Context<P extends Params = Record<string, string | undefined>> =
-	& Partial<ConnInfo>
-	& {
-		/** The path parameters found in the URL pathname */
-		params: P;
-	};
+export type Context<P extends Params = Record<string, string | undefined>> = Partial<ConnInfo> & {
+	/** The path parameters found in the URL pathname */
+	params: P;
+};
 
 /** The path parameters found in the URL pathname */
 export type Params = Record<string, string | undefined>;
@@ -73,10 +67,7 @@ export class Router {
 	}
 
 	/** Handles an incoming request */
-	async handler(
-		request: Request,
-		connection?: ConnInfo,
-	) {
+	async handler(request: Request, connection?: ConnInfo) {
 		const { method } = request;
 		const { pathname, search } = new URL(request.url);
 
@@ -233,10 +224,7 @@ export async function fromFileSystem(path: string): Promise<Router> {
 }
 
 /** Find the best route match for a given request */
-export function getRouteMatch(
-	request: Request,
-	routes: RouteMap,
-): [Pattern, Handler] {
+export function getRouteMatch(request: Request, routes: RouteMap): [Pattern, Handler] {
 	const method = toMethod(request.method);
 	const { pathname } = new URL(request.url);
 
@@ -270,10 +258,7 @@ export function notFound(): Response {
 }
 
 /** Redirects a request to a given destination. Defaults to a "307 Temporary Redirect" status code. */
-export function redirect(
-	destination: URL | string,
-	status: RedirectStatus = 307,
-): Response {
+export function redirect(destination: URL | string, status: RedirectStatus = 307): Response {
 	const location = destination instanceof URL ? destination.toString() : destination;
 
 	return new Response(null, {
@@ -348,8 +333,7 @@ export function toPattern(pathname: string): Pattern {
 
 /** Parses a pathname into a key-value params object for a given pattern. */
 export function toParams(pathname: string, pattern: Pattern): Params {
-	return new URLPattern({ pathname: pattern })
-		.exec({ pathname })?.pathname.groups ?? {};
+	return new URLPattern({ pathname: pattern }).exec({ pathname })?.pathname.groups ?? {};
 }
 
 /** Transforms a given function into a Handler. Fallback to `notFound` */
@@ -370,12 +354,15 @@ export function isPattern(input: string): input is Pattern {
 /** A type guard that determines if the input is a Router. */
 // deno-lint-ignore no-explicit-any
 export function isRouter(input: any): input is Router {
-	return input instanceof Router ||
-		input !== undefined &&
+	return (
+		input instanceof Router ||
+		(input !== undefined &&
 			input !== null &&
 			Array.isArray(input) === false &&
 			["string", "number", "boolean", "string"].includes(typeof input) === false &&
-			"handler" in input && isHandler(input.handler);
+			"handler" in input &&
+			isHandler(input.handler))
+	);
 }
 
 /** A type guard that determines if the input is a Handler. */

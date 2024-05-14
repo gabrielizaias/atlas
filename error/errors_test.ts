@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "../deps_dev.ts";
+import { assertEquals, assertThrows } from "@std/assert";
 import { BaseError } from "./errors.ts";
 
 Deno.test("[error/errors] BaseError accepts a message", () => {

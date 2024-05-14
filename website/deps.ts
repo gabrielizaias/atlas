@@ -1,2 +1,2 @@
-export { serve } from "https://deno.land/std@0.207.0/http/server.ts";
-export { serveFile } from "https://deno.land/std@0.207.0/http/file_server.ts";
+export { serve } from "@std/http/server";
+export { serveFile } from "@std/http/file_server";

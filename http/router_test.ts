@@ -1,5 +1,5 @@
-import { assertEquals } from "../deps_dev.ts";
-import { STATUS_CODE, STATUS_TEXT } from "./deps.ts";
+import { assertEquals } from "@std/assert";
+import { STATUS_CODE, STATUS_TEXT } from "@std/http";
 import {
 	type Handler,
 	isMethod,

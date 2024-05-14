@@ -1,6 +1,4 @@
-// @todo(gabeidx)
-// @ts-ignore temporarily break http/server types
-import { serve, type ServeInit } from "./deps.ts";
+import { serve, type ServeInit } from "@std/http/server";
 import { logger } from "../deps.ts";
 import { fromFileSystem, type Handler, isHandler, isRouter, Router } from "./router.ts";
 

@@ -1,15 +1,13 @@
 import { logger } from "../deps.ts";
+import { extname, toFileUrl } from "@std/path";
 import {
 	type ConnInfo,
-	extname,
 	type RedirectStatus,
 	STATUS_CODE,
 	STATUS_TEXT,
 	type StatusCode,
-	toFileUrl,
-	walk,
-	type WalkOptions,
-} from "./deps.ts";
+} from "@std/http";
+import { walk, type WalkOptions } from "@std/fs";
 
 /**
  * Supported HTTP methods.

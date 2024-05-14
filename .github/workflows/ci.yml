@@ -41,7 +41,7 @@ jobs:
         deno-version: ${{ env.DENO_VERSION }}
 
     - name: Restore dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ env.DENO_DIR }}
         key: dependencies-${{ hashFiles('deno.lock') }}

@@ -50,5 +50,16 @@
 		"@std/path": "jsr:@std/path@0.212.0",
 		"@std/cli": "jsr:@std/cli@0.212.0",
 		"@std/log": "jsr:@std/log@0.212.0"
+	},
+	"publish": {
+		"exclude": [
+			"./**/*_test.ts",
+			".editorconfig",
+			".gitattributes",
+			".github",
+			"contributing.md",
+			"examples",
+			"website"
+		]
 	}
 }

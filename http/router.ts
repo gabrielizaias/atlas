@@ -2,10 +2,10 @@ import { logger } from "../deps.ts";
 import {
 	type ConnInfo,
 	extname,
+	type RedirectStatus,
 	STATUS_CODE,
 	STATUS_TEXT,
 	type StatusCode,
-	type RedirectStatus,
 	toFileUrl,
 	walk,
 	type WalkOptions,

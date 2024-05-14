@@ -44,19 +44,13 @@ export type HandlerMap = Map<Method, Handler>;
 export type Handler<P extends Params = Record<string, string | undefined>> = (
 	request: Request,
 	context: Context<P>,
-) =>
-	| Response
-	| Promise<Response>
-	| Record<string, unknown>
-	| Promise<Record<string, unknown>>;
+) => Response | Promise<Response> | Record<string, unknown> | Promise<Record<string, unknown>>;
 
 /** The Request context */
-export type Context<P extends Params = Record<string, string | undefined>> =
-	& Partial<ConnInfo>
-	& {
-		/** The path parameters found in the URL pathname */
-		params: P;
-	};
+export type Context<P extends Params = Record<string, string | undefined>> = Partial<ConnInfo> & {
+	/** The path parameters found in the URL pathname */
+	params: P;
+};
 
 /** The path parameters found in the URL pathname */
 export type Params = Record<string, string | undefined>;
@@ -68,15 +62,12 @@ export class Router {
 		this.#routes = new Map();
 	}
 
-	get routes() {
+	get routes(): RouteMap {
 		return this.#routes;
 	}
 
 	/** Handles an incoming request */
-	async handler(
-		request: Request,
-		connection?: ConnInfo,
-	) {
+	async handler(request: Request, connection?: ConnInfo): Promise<Response> {
 		const { method } = request;
 		const { pathname, search } = new URL(request.url);
 
@@ -125,7 +116,7 @@ export class Router {
 
 	/** The default error handler */
 	// deno-lint-ignore require-await
-	async errorHandler(error: unknown, _request?: Request, _context?: Context) {
+	async errorHandler(error: unknown, _request?: Request, _context?: Context): Promise<Response> {
 		let status: StatusCode = STATUS_CODE.InternalServerError;
 		let body = `${STATUS_TEXT[status]}`;
 		const headers = new Headers();
@@ -147,7 +138,7 @@ export class Router {
 	}
 
 	/** Registers a Request handler for a given method and pattern */
-	register(method: Method, pattern: Pattern, handler: Handler) {
+	register(method: Method, pattern: Pattern, handler: Handler): this {
 		const key: RouteKey = `${method} ${pattern}`;
 
 		// TODO: allow multiple handlers per route (middleware?)
@@ -165,37 +156,37 @@ export class Router {
 	}
 
 	/** Registers a GET handler */
-	get(pattern: Pattern, handler: Handler) {
+	get(pattern: Pattern, handler: Handler): this {
 		return this.register("GET", pattern, handler);
 	}
 
 	/** Registers a POST handler */
-	post(pattern: Pattern, handler: Handler) {
+	post(pattern: Pattern, handler: Handler): this {
 		return this.register("POST", pattern, handler);
 	}
 
 	/** Registers a PUT handler */
-	put(pattern: Pattern, handler: Handler) {
+	put(pattern: Pattern, handler: Handler): this {
 		return this.register("PUT", pattern, handler);
 	}
 
 	/** Registers a PATCH handler */
-	patch(pattern: Pattern, handler: Handler) {
+	patch(pattern: Pattern, handler: Handler): this {
 		return this.register("PATCH", pattern, handler);
 	}
 
 	/** Registers a DELETE handler */
-	del(pattern: Pattern, handler: Handler) {
+	del(pattern: Pattern, handler: Handler): this {
 		return this.register("DELETE", pattern, handler);
 	}
 
 	/** Registers an OPTIONS handler */
-	options(pattern: Pattern, handler: Handler) {
+	options(pattern: Pattern, handler: Handler): this {
 		return this.register("OPTIONS", pattern, handler);
 	}
 
 	/** Registers an ANY handler */
-	any(pattern: Pattern, handler: Handler) {
+	any(pattern: Pattern, handler: Handler): this {
 		return this.register("ANY", pattern, handler);
 	}
 }
@@ -233,10 +224,7 @@ export async function fromFileSystem(path: string): Promise<Router> {
 }
 
 /** Find the best route match for a given request */
-export function getRouteMatch(
-	request: Request,
-	routes: RouteMap,
-): [Pattern, Handler] {
+export function getRouteMatch(request: Request, routes: RouteMap): [Pattern, Handler] {
 	const method = toMethod(request.method);
 	const { pathname } = new URL(request.url);
 
@@ -270,10 +258,7 @@ export function notFound(): Response {
 }
 
 /** Redirects a request to a given destination. Defaults to a "307 Temporary Redirect" status code. */
-export function redirect(
-	destination: URL | string,
-	status: RedirectStatus = 307,
-): Response {
+export function redirect(destination: URL | string, status: RedirectStatus = 307): Response {
 	const location = destination instanceof URL ? destination.toString() : destination;
 
 	return new Response(null, {
@@ -348,8 +333,7 @@ export function toPattern(pathname: string): Pattern {
 
 /** Parses a pathname into a key-value params object for a given pattern. */
 export function toParams(pathname: string, pattern: Pattern): Params {
-	return new URLPattern({ pathname: pattern })
-		.exec({ pathname })?.pathname.groups ?? {};
+	return new URLPattern({ pathname: pattern }).exec({ pathname })?.pathname.groups ?? {};
 }
 
 /** Transforms a given function into a Handler. Fallback to `notFound` */
@@ -370,12 +354,15 @@ export function isPattern(input: string): input is Pattern {
 /** A type guard that determines if the input is a Router. */
 // deno-lint-ignore no-explicit-any
 export function isRouter(input: any): input is Router {
-	return input instanceof Router ||
-		input !== undefined &&
+	return (
+		input instanceof Router ||
+		(input !== undefined &&
 			input !== null &&
 			Array.isArray(input) === false &&
 			["string", "number", "boolean", "string"].includes(typeof input) === false &&
-			"handler" in input && isHandler(input.handler);
+			"handler" in input &&
+			isHandler(input.handler))
+	);
 }
 
 /** A type guard that determines if the input is a Handler. */

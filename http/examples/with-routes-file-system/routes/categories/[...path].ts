@@ -1,4 +1,4 @@
-import { type Handler } from "../../../../mod.ts";
+import type { Handler } from "../../../../mod.ts";
 
 type Params = {
 	path: string;

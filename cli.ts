@@ -1,5 +1,5 @@
 import { logger, parseArgs } from "./deps.ts";
-import { type Command } from "./console/mod.ts";
+import type { Command } from "./console/mod.ts";
 
 /**
  * Initializes an Atlas application

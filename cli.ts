@@ -1,5 +1,5 @@
 import { logger } from "./deps.ts";
-import { parseArgs } from "@std/cli/parse_args";
+import { parseArgs } from "@std/cli/parse-args";
 import type { Command } from "./console/mod.ts";
 
 /**

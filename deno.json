@@ -18,8 +18,8 @@
 		"exclude": [".git", ".deno", "cov"]
 	},
 	"tasks": {
-		"cache": "deno cache -r deps_dev.ts cli.ts console/mod.ts error/mod.ts http/mod.ts log/mod.ts",
-		"check": "deno check -r cli.ts console/mod.ts error/mod.ts http/mod.ts log/mod.ts",
+		"cache": "deno cache -r deps_dev.ts cli.ts console/mod.ts error/mod.ts http/mod.ts",
+		"check": "deno check -r cli.ts console/mod.ts error/mod.ts http/mod.ts",
 		"dev:website": "deno run -A --watch website/main.ts",
 		"test": "deno test -A --no-check --coverage=./cov"
 	}

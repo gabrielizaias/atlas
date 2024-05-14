@@ -1,5 +1,4 @@
-import { parse } from "./log/deps.ts";
-import { default as logger } from "./log/mod.ts";
+import { logger, parseArgs } from "./deps.ts";
 import { type Command } from "./console/mod.ts";
 
 /**
@@ -10,7 +9,7 @@ const init: Command = {
 	description: "Initializes an Atlas application",
 	handler: () => {
 		// TBD
-		logger.notice("`atlas init` command not implemented yet");
+		logger.info("`atlas init` command not implemented yet");
 	},
 };
 
@@ -25,7 +24,7 @@ const start: Command = {
   `,
 	handler: () => {
 		// TBD
-		logger.notice("`atlas start` command not implemented yet");
+		logger.info("`atlas start` command not implemented yet");
 	},
 };
 
@@ -36,17 +35,18 @@ if (import.meta.main) {
 	]);
 
 	const command = Deno.args[0] ?? "";
-	const args = parse(Deno.args.slice(1));
+	const args = parseArgs(Deno.args.slice(1));
 
 	if (commands.has(command)) {
 		try {
 			await commands.get(command)?.handler(args);
 		} catch (err: unknown) {
-			logger.error(
-				`command '${command}' failed with message: ${(err as Error).message}`,
-			);
+			logger.error(`command '${command}' failed with message: ${(err as Error).message}`, {
+				err,
+				command,
+			});
 		}
 	} else {
-		logger.error(`command '${command}' not found`);
+		logger.error(`command '${command}' not found`, { command });
 	}
 }

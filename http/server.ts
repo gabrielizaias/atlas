@@ -1,4 +1,7 @@
+// @todo(gabeidx)
+// @ts-ignore temporarily break http/server types
 import { serve, type ServeInit } from "./deps.ts";
+import { logger } from "../deps.ts";
 import { fromFileSystem, type Handler, isHandler, isRouter, Router } from "./router.ts";
 
 export type StartOptions = Pick<ServeInit, "onListen"> & {
@@ -15,9 +18,11 @@ export async function start(router: Router, options?: StartOptions): Promise<voi
 export async function start(options?: StartOptions): Promise<void>;
 export async function start(init?: unknown, options?: StartOptions): Promise<void> {
 	let router: Router;
+	// @todo(gabeidx)
+	// @ts-ignore temporarily break http/server types
 	let opts: StartOptions = {
 		root: Deno.cwd(),
-		...options ?? {},
+		...(options ?? {}),
 	};
 
 	// router provided
@@ -40,13 +45,13 @@ export async function start(init?: unknown, options?: StartOptions): Promise<voi
 		await serve(router.handler.bind(router), {
 			signal: controller.signal,
 			onListen: opts?.onListen,
-			onError: (error) => {
+			onError: (error: unknown) => {
 				opts?.onError?.(error);
 				return router.errorHandler.bind(router)(error);
 			},
 		});
 	} catch (error) {
-		opts?.onError?.(error);
+		opts?.onError?.(error) ?? logger.error(error);
 		controller.abort();
 	}
 }

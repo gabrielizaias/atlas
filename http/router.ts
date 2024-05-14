@@ -1,11 +1,11 @@
+import { logger } from "../deps.ts";
 import {
 	type ConnInfo,
 	extname,
-	logger,
+	type RedirectStatus,
 	STATUS_CODE,
 	STATUS_TEXT,
 	type StatusCode,
-	type RedirectStatus,
 	toFileUrl,
 	walk,
 	type WalkOptions,
@@ -118,7 +118,7 @@ export class Router {
 			statusText: STATUS_TEXT[status],
 		});
 
-		logger.info(status, `${method} ${pathname}${search}`);
+		logger.info(`${status} ${method} ${pathname}${search}`, { status, method, pathname, search });
 
 		return response;
 	}
@@ -152,7 +152,10 @@ export class Router {
 
 		// TODO: allow multiple handlers per route (middleware?)
 		if (this.#routes.has(key)) {
-			logger.warning(`A handler for "${method} ${pattern}" is already registered. Skipping…`);
+			logger.warn(`A handler for "${method} ${pattern}" is already registered. Skipping…`, {
+				method,
+				pattern,
+			});
 			return this;
 		}
 

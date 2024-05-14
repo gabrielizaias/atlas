@@ -1,4 +1,4 @@
-import { type HandlerMap } from "../../../../mod.ts";
+import type { HandlerMap } from "../../../../mod.ts";
 
 function listUsersHandler() {
 	return { message: "listUsers handler" };

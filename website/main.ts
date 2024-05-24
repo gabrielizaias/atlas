@@ -1,4 +1,4 @@
-import { serve, serveFile } from "./deps.ts";
+import { serveFile } from "./deps.ts";
 
 // TODO: replace with log module
 const logger = console;
@@ -58,7 +58,7 @@ async function handler(request: Request): Promise<Response> {
 			status = 307;
 			headers = {
 				...headers,
-				"location": `https://doc.deno.land/https://deno.land/x/atlas${mod}`,
+				"location": `https://jsr.io/@atlasland/atlas/doc${mod}/~`,
 			};
 		} // docs
 		else if (pathname === "/docs") {
@@ -128,7 +128,7 @@ async function handler(request: Request): Promise<Response> {
 		}
 
 		const payload = render(layout, {
-			...parseProps(content, config.pages.props),
+			...parseProps(content ?? "", config.pages.props),
 			content,
 		});
 
@@ -195,4 +195,4 @@ function parseProps<T>(
 	return parsed;
 }
 
-await serve(handler);
+Deno.serve(handler);

@@ -1,0 +1,14 @@
+{
+	"formatter": "language_server",
+	"languages": {
+		"JSON": {
+			"tab_size": 2,
+			"hard_tabs": true
+		},
+		"TypeScript": {
+			"language_servers": [
+				"deno"
+			]
+		}
+	}
+}

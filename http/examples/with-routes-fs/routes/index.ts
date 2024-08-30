@@ -1,4 +1,4 @@
-import type { Handler } from "../../../mod.ts";
+import type { Handler } from "@atlasland/http";
 
 export const handler: Handler = () => {
 	return { message: "index route" };

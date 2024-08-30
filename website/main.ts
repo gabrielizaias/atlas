@@ -1,7 +1,5 @@
-import { serveFile } from "jsr:@std/http@0.224.1/file-server";
-
-// TODO: replace with log module
-const logger = console;
+import { logger } from "../_utils/log.ts";
+import { serveFile } from "@std/http/file-server";
 
 // set cwd for deno deploy
 const cwd = Deno.cwd().includes("website") ? Deno.cwd() : `${Deno.cwd()}/website`;
@@ -161,7 +159,7 @@ function render(
 			}
 
 			if (Object.hasOwn(props, key)) {
-				rendered = rendered.replaceAll(`{{ ${key} }}`, value.toString());
+				rendered = (rendered ?? "").replaceAll(`{{ ${key} }}`, value.toString());
 			}
 		}
 	}

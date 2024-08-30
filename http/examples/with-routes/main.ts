@@ -1,4 +1,4 @@
-import { redirect, Router, start } from "../../mod.ts";
+import { notFound, redirect, Router, start } from "@atlasland/http";
 
 const router = new Router();
 
@@ -27,12 +27,20 @@ router.get("/:category/:subcategory", (_request, { params }) => {
 	};
 });
 
+router.get("/404", () => {
+	return notFound();
+});
+
 router.get("/search", () => {
 	return redirect("https://www.google.com");
 });
 
 router.get("/redirect", () => {
 	return redirect("/computers/laptops", 308);
+});
+
+router.get("/fail", () => {
+	throw new Error("Failed to do something!");
 });
 
 await start(router);

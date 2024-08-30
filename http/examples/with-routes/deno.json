@@ -1,4 +1,5 @@
 {
+	"$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
 	"tasks": {
 		"start": "deno run --no-lock -A main.ts",
 		"dev": "deno run --no-lock -A --watch main.ts"

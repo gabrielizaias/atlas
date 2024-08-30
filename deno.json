@@ -1,10 +1,49 @@
 {
-	"name": "@atlasland/atlas",
-	"version": "0.6.0",
-	"exports": {
-		"./console": "./console/mod.ts",
-		"./error": "./error/mod.ts",
-		"./http": "./http/mod.ts"
+	"$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+	"tasks": {
+		"cache": "deno cache -r cli.ts console/mod.ts error/mod.ts http/mod.ts",
+		"check": "deno check -r cli.ts console/mod.ts error/mod.ts http/mod.ts",
+		"test": "deno test -A --no-check --coverage=./cov"
+	},
+	"workspace": [
+		"./console",
+		"./error",
+		"./http",
+		"./http/examples/basic",
+		"./http/examples/with-routes",
+		"./http/examples/with-routes-fs",
+		"./website"
+	],
+	"imports": {
+		"@std/assert": "jsr:@std/assert@^1.0.3",
+		"@std/cli": "jsr:@std/cli@^1.0.4",
+		"@std/fs": "jsr:@std/fs@^1.0.2",
+		"@std/http": "jsr:@std/http@^1.0.4",
+		"@std/log": "jsr:@std/log@^0.224.6",
+		"@std/path": "jsr:@std/path@^1.0.3"
+	},
+	"fmt": {
+		"useTabs": true,
+		"lineWidth": 100
+	},
+	"exclude": [
+		".git",
+		".deno",
+		"cov",
+		"examples",
+		"docs"
+	],
+	"publish": {
+		"exclude": [
+			"./**/*_test.ts",
+			".editorconfig",
+			".gitattributes",
+			".github",
+			"contributing.md",
+			"examples",
+			"website",
+			"docs"
+		]
 	},
 	"compilerOptions": {
 		"allowJs": false,
@@ -20,46 +59,5 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"useUnknownInCatchVariables": true
-	},
-	"fmt": {
-		"exclude": [
-			".git",
-			".deno",
-			"cov"
-		],
-		"useTabs": true,
-		"lineWidth": 100
-	},
-	"lint": {
-		"exclude": [
-			".git",
-			".deno",
-			"cov"
-		]
-	},
-	"tasks": {
-		"cache": "deno cache -r cli.ts console/mod.ts error/mod.ts http/mod.ts",
-		"check": "deno check -r cli.ts console/mod.ts error/mod.ts http/mod.ts",
-		"dev:website": "deno run -A --watch website/main.ts",
-		"test": "deno test -A --no-check --coverage=./cov"
-	},
-	"imports": {
-		"@std/assert": "jsr:@std/assert@1",
-		"@std/http": "jsr:@std/http@0.224",
-		"@std/fs": "jsr:@std/fs@1",
-		"@std/path": "jsr:@std/path@1",
-		"@std/cli": "jsr:@std/cli@1",
-		"@std/log": "jsr:@std/log@0.224"
-	},
-	"publish": {
-		"exclude": [
-			"./**/*_test.ts",
-			".editorconfig",
-			".gitattributes",
-			".github",
-			"contributing.md",
-			"examples",
-			"website"
-		]
 	}
 }

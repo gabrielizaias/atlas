@@ -1,7 +1,7 @@
-import { start } from "../../mod.ts";
+import { start } from "@atlasland/http";
 
 function handler() {
-	return { message: "hello world!" };
+	return "hello world!";
 }
 
 await start(handler);

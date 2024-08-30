@@ -1,10 +1,11 @@
-import { assertEquals } from "@std/assert";
+import { assert, assertEquals } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http";
 import {
 	type Handler,
 	isMethod,
 	isPattern,
 	isRouter,
+	type Method,
 	METHODS,
 	notFound,
 	type Params,
@@ -41,9 +42,9 @@ Deno.test("[http/router] router.register() allows only one handler for a given m
 });
 
 for (const method of Object.values(METHODS)) {
-	const fn = method === METHODS.DELETE ? "del" : method.toLowerCase();
+	const fn = method === "DELETE" ? "del" : method.toLowerCase();
 
-	Deno.test(`[http/router] router.${fn}() registers a new ${method} handler`, () => {
+	Deno.test(`[http/router] router.${fn}() registers a ${method} handler`, () => {
 		const router = new Router();
 		const handler: Handler = () => ({});
 
@@ -51,7 +52,8 @@ for (const method of Object.values(METHODS)) {
 		// @ts-ignore
 		router[fn]("/", handler);
 
-		assertEquals(router.routes, new Map([[`${method} /`, handler]]));
+		assert(router.routes.has(`${method} /`));
+		assertEquals(router.routes.get(`${method} /`), handler);
 	});
 }
 
@@ -163,19 +165,19 @@ Deno.test("[http/router] isMethod() correctly determines if the input is a valid
 });
 
 Deno.test("[http/router] toMethod() returns a valid HTTP Method", () => {
-	const expectations = new Map([
-		[toMethod("get"), METHODS.GET],
-		[toMethod("GET"), METHODS.GET],
-		[toMethod("post"), METHODS.POST],
-		[toMethod("put"), METHODS.PUT],
-		[toMethod("patch"), METHODS.PATCH],
-		[toMethod("del"), METHODS.DELETE],
-		[toMethod("delete"), METHODS.DELETE],
-		[toMethod("options"), METHODS.OPTIONS],
-		[toMethod("any"), METHODS.ANY],
-		[toMethod("*"), METHODS.ANY],
-		[toMethod("__gibberish__"), METHODS.ANY],
-		[toMethod("123456709"), METHODS.ANY],
+	const expectations = new Map<unknown, Method>([
+		[toMethod("get"), "GET"],
+		[toMethod("GET"), "GET"],
+		[toMethod("post"), "POST"],
+		[toMethod("put"), "PUT"],
+		[toMethod("patch"), "PATCH"],
+		[toMethod("del"), "DELETE"],
+		[toMethod("delete"), "DELETE"],
+		[toMethod("options"), "OPTIONS"],
+		[toMethod("any"), "ANY"],
+		[toMethod("*"), "ANY"],
+		[toMethod("__gibberish__"), "ANY"],
+		[toMethod("123456709"), "ANY"],
 	]);
 
 	for (const [method, expected] of expectations) {

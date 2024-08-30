@@ -1,4 +1,4 @@
-import type { HandlerMap } from "../../../../mod.ts";
+import type { HandlerMap } from "@atlasland/http";
 
 function listUsersHandler() {
 	return { message: "listUsers handler" };

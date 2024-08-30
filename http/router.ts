@@ -1,35 +1,28 @@
-import { logger } from "../deps.ts";
+import { logger } from "../_utils/log.ts";
 import { extname, toFileUrl } from "@std/path";
-import {
-	type ConnInfo,
-	type RedirectStatus,
-	STATUS_CODE,
-	STATUS_TEXT,
-	type StatusCode,
-} from "@std/http";
+import { type RedirectStatus, STATUS_CODE, STATUS_TEXT, type StatusCode } from "@std/http";
 import { walk, type WalkOptions } from "@std/fs";
 
-/**
- * Supported HTTP methods.
+/** Supported HTTP methods.
  *
  * `ANY` is the wildcard value for any request method.
  */
-export const METHODS = {
-	GET: "GET",
-	POST: "POST",
-	PUT: "PUT",
-	PATCH: "PATCH",
-	DELETE: "DELETE",
-	OPTIONS: "OPTIONS",
-	ANY: "ANY",
-} as const;
+export const METHODS = [
+	"GET",
+	"POST",
+	"PUT",
+	"PATCH",
+	"DELETE",
+	"OPTIONS",
+	"HEAD",
+	"ANY",
+] as const;
 
-/**
- * An HTTP method.
+/** An HTTP method.
  *
  * `ANY` is the wildcard value for any request method.
  */
-export type Method = keyof typeof METHODS;
+export type Method = typeof METHODS[number];
 
 /** An `URLPattern` string to match against a `Request.pathname` */
 export type Pattern = `/${string}` | "*";
@@ -42,13 +35,21 @@ export type HandlerMap = Map<Method, Handler>;
 export type Handler<P extends Params = Record<string, string | undefined>> = (
 	request: Request,
 	context: Context<P>,
-) => Response | Promise<Response> | Record<string, unknown> | Promise<Record<string, unknown>>;
+) =>
+	| Response
+	| Promise<Response>
+	| Record<string, unknown>
+	| Promise<Record<string, unknown>>
+	| string
+	| null;
 
 /** The Request context */
-export type Context<P extends Params = Record<string, string | undefined>> = Partial<ConnInfo> & {
-	/** The path parameters found in the URL pathname */
-	params: P;
-};
+export type Context<P extends Params = Record<string, string | undefined>> =
+	& Partial<Deno.ServeHandlerInfo>
+	& {
+		/** The path parameters found in the URL pathname */
+		params: P;
+	};
 
 /** The path parameters found in the URL pathname */
 export type Params = Record<string, string | undefined>;
@@ -65,15 +66,18 @@ export class Router {
 	}
 
 	/** Handles an incoming request */
-	async handler(request: Request, connection?: ConnInfo): Promise<Response> {
+	async handler(
+		request: Request,
+		info?: Deno.ServeHandlerInfo,
+	): Promise<Response> {
 		const { method } = request;
 		const { pathname, search } = new URL(request.url);
 
-		// TODO: handle request for assets
+		// TODO(gabeidx): handle request for assets
 
 		const [pattern, handler] = getRouteMatch(request, this.#routes);
 		const params = toParams(pathname, pattern);
-		const context = { ...connection, params };
+		const context = { ...info, params };
 
 		let status: StatusCode = STATUS_CODE.OK;
 		let headers = new Headers();
@@ -107,7 +111,12 @@ export class Router {
 			statusText: STATUS_TEXT[status],
 		});
 
-		logger.info(`${status} ${method} ${pathname}${search}`, { status, method, pathname, search });
+		logger.info(`${status} ${method.toUpperCase()} ${pathname}${search}`, {
+			status,
+			method,
+			pathname,
+			search,
+		});
 
 		return response;
 	}
@@ -155,7 +164,10 @@ export class Router {
 
 	/** Registers a GET handler */
 	get(pattern: Pattern, handler: Handler): this {
-		return this.register("GET", pattern, handler);
+		return this
+			.register("GET", pattern, handler)
+			// Register a HEAD handler for a GET handler by default
+			.register("HEAD", pattern, handler);
 	}
 
 	/** Registers a POST handler */
@@ -181,6 +193,11 @@ export class Router {
 	/** Registers an OPTIONS handler */
 	options(pattern: Pattern, handler: Handler): this {
 		return this.register("OPTIONS", pattern, handler);
+	}
+
+	/** Registers a HEAD handler */
+	head(pattern: Pattern, handler: Handler): this {
+		return this.register("HEAD", pattern, handler);
 	}
 
 	/** Registers an ANY handler */
@@ -274,8 +291,7 @@ export function toMethod(method: string): Method {
 	return isMethod(upper) ? upper : "ANY";
 }
 
-/**
- * Transforms a given string into an URLPattern `pathname` pattern. Fallback to `"*".
+/** Transforms a given string into an URLPattern `pathname` pattern. Fallback to `"*".
  *
  * Handles file-system paths as well.
  *
@@ -293,7 +309,7 @@ export function toPattern(pathname: string): Pattern {
 		segments.shift();
 	}
 
-	// `/name.{t|j}s{x}?` -> `/name`
+	// `/name.{t|j}sx?` -> `/name`
 	segments[segments.length - 1] = segments.at(-1)?.replace(extname(pathname), "") ?? "";
 
 	// `/index` -> `/`

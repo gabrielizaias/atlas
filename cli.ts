@@ -1,4 +1,4 @@
-import { logger } from "./deps.ts";
+import { logger } from "./_utils/log.ts";
 import { parseArgs } from "@std/cli/parse-args";
 import type { Command } from "./console/mod.ts";
 
@@ -29,25 +29,23 @@ const start: Command = {
 	},
 };
 
-if (import.meta.main) {
-	const commands = new Map<Command["name"], Command>([
-		[init.name, init],
-		[start.name, start],
-	]);
+const commands = new Map<Command["name"], Command>([
+	[init.name, init],
+	[start.name, start],
+]);
 
-	const command = Deno.args[0] ?? "";
-	const args = parseArgs(Deno.args.slice(1));
+const command = Deno.args[0] ?? "";
+const args = parseArgs(Deno.args.slice(1));
 
-	if (commands.has(command)) {
-		try {
-			await commands.get(command)?.handler(args);
-		} catch (err: unknown) {
-			logger.error(`command '${command}' failed with message: ${(err as Error).message}`, {
-				err,
-				command,
-			});
-		}
-	} else {
-		logger.error(`command '${command}' not found`, { command });
+if (commands.has(command)) {
+	try {
+		await commands.get(command)?.handler(args);
+	} catch (err: unknown) {
+		logger.error(`command '${command}' failed with message: ${(err as Error).message}`, {
+			err,
+			command,
+		});
 	}
+} else {
+	logger.error(`command '${command}' not found`, { command });
 }

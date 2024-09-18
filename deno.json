@@ -1,8 +1,8 @@
 {
 	"$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
 	"tasks": {
-		"cache": "deno cache -r cli.ts console/mod.ts error/mod.ts http/mod.ts",
-		"check": "deno check -r cli.ts console/mod.ts error/mod.ts http/mod.ts",
+		"cache": "deno cache -r cli.ts console/mod.ts error/mod.ts http/mod.ts website/main.ts",
+		"check": "deno check -r cli.ts console/mod.ts error/mod.ts http/mod.ts website/main.ts",
 		"test": "deno test -A --no-check --coverage=./cov"
 	},
 	"workspace": [

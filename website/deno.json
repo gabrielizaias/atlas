@@ -2,5 +2,9 @@
 	"$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
 	"tasks": {
 		"dev": "deno run -A --watch ./main.ts"
+	},
+	"imports": {
+		"@std/http": "jsr:@std/http@^1.0.4",
+		"@std/log": "jsr:@std/log@^0.224.6"
 	}
 }

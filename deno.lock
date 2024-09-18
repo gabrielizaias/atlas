@@ -160,6 +160,14 @@
       "jsr:@std/http@^1.0.4",
       "jsr:@std/log@^0.224.6",
       "jsr:@std/path@^1.0.3"
-    ]
+    ],
+    "members": {
+      "website": {
+        "dependencies": [
+          "jsr:@std/http@^1.0.4",
+          "jsr:@std/log@^0.224.6"
+        ]
+      }
+    }
   }
 }
